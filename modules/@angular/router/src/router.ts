@@ -13,13 +13,13 @@ import 'rxjs/add/operator/reduce';
 import 'rxjs/add/operator/every';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/observable/of';
 
 import {Location} from '@angular/common';
 import {ComponentResolver, Injector, ReflectiveInjector, Type} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
 import {Subscription} from 'rxjs/Subscription';
-import {of } from 'rxjs/observable/of';
 
 import {applyRedirects} from './apply_redirects';
 import {Data, ResolveData, RouterConfig, validateConfig} from './config';
@@ -328,7 +328,7 @@ export class Router {
             if (shouldActivate) {
               return preActivation.resolveData().map(() => shouldActivate);
             } else {
-              return of (shouldActivate);
+              return Observable.of(shouldActivate);
             }
 
           })
@@ -394,7 +394,7 @@ class PreActivation {
   }
 
   checkGuards(): Observable<boolean> {
-    if (this.checks.length === 0) return of (true);
+    if (this.checks.length === 0) return Observable.of(true);
     return Observable.from(this.checks)
         .map(s => {
           if (s instanceof CanActivate) {
@@ -410,13 +410,13 @@ class PreActivation {
   }
 
   resolveData(): Observable<any> {
-    if (this.checks.length === 0) return of (null);
+    if (this.checks.length === 0) return Observable.of(null);
     return Observable.from(this.checks)
         .mergeMap(s => {
           if (s instanceof CanActivate) {
             return this.runResolve(s.route);
           } else {
-            return of (null);
+            return Observable.of(null);
           }
         })
         .reduce((_, __) => _);
@@ -497,7 +497,7 @@ class PreActivation {
 
   private runCanActivate(future: ActivatedRouteSnapshot): Observable<boolean> {
     const canActivate = future._routeConfig ? future._routeConfig.canActivate : null;
-    if (!canActivate || canActivate.length === 0) return of (true);
+    if (!canActivate || canActivate.length === 0) return Observable.of(true);
     return Observable.from(canActivate)
         .map(c => {
           const guard = this.injector.get(c);
@@ -513,7 +513,7 @@ class PreActivation {
 
   private runCanDeactivate(component: Object, curr: ActivatedRouteSnapshot): Observable<boolean> {
     const canDeactivate = curr && curr._routeConfig ? curr._routeConfig.canDeactivate : null;
-    if (!canDeactivate || canDeactivate.length === 0) return of (true);
+    if (!canDeactivate || canDeactivate.length === 0) return Observable.of(true);
     return Observable.from(canDeactivate)
         .map(c => {
           const guard = this.injector.get(c);
@@ -550,7 +550,7 @@ class PreActivation {
     if (resolvingObs.length > 0) {
       return Observable.forkJoin(resolvingObs).map(r => resolvedData);
     } else {
-      return of (resolvedData);
+      return Observable.of(resolvedData);
     }
   }
 }
@@ -559,7 +559,7 @@ function wrapIntoObservable<T>(value: T | Observable<T>): Observable<T> {
   if (value instanceof Observable) {
     return value;
   } else {
-    return of (value);
+    return Observable.of(value);
   }
 }
 

@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import 'rxjs/add/observable/of';
+
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
-import {of } from 'rxjs/observable/of';
 
 import {Route, RouterConfig} from './config';
 import {PRIMARY_OUTLET} from './shared';
@@ -43,7 +44,7 @@ function createUrlTree(urlTree: UrlTree, rootCandidate: UrlSegment): Observable<
   const root = rootCandidate.pathsWithParams.length > 0 ?
       new UrlSegment([], {[PRIMARY_OUTLET]: rootCandidate}) :
       rootCandidate;
-  return of (new UrlTree(root, urlTree.queryParams, urlTree.fragment));
+  return Observable.of(new UrlTree(root, urlTree.queryParams, urlTree.fragment));
 }
 
 function expandSegment(routes: Route[], segment: UrlSegment, outlet: string): UrlSegment {

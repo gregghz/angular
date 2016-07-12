@@ -8,11 +8,11 @@
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/forkJoin';
 
 import {ComponentResolver} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
-import {forkJoin} from 'rxjs/observable/forkJoin';
-import {fromPromise} from 'rxjs/observable/fromPromise';
 
 import {ActivatedRouteSnapshot, RouterStateSnapshot} from './router_state';
 import {TreeNode} from './utils/tree';
@@ -25,14 +25,14 @@ export function resolve(
 function resolveNode(
     resolver: ComponentResolver, node: TreeNode<ActivatedRouteSnapshot>): Observable<any> {
   if (node.children.length === 0) {
-    return fromPromise(resolveComponent(resolver, <any>node.value).then(factory => {
+    return Observable.fromPromise(resolveComponent(resolver, <any>node.value).then(factory => {
       node.value._resolvedComponentFactory = factory;
       return node.value;
     }));
 
   } else {
     const c = node.children.map(c => resolveNode(resolver, c).toPromise());
-    return forkJoin(c).map(_ => resolveComponent(resolver, <any>node.value).then(factory => {
+    return Observable.forkJoin(c).map(_ => resolveComponent(resolver, <any>node.value).then(factory => {
       node.value._resolvedComponentFactory = factory;
       return node.value;
     }));

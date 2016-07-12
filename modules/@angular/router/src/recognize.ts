@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import 'rxjs/add/observable/of';
+
 import {Type} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
-import {of } from 'rxjs/observable/of';
 
 import {Data, ResolveData, Route, RouterConfig} from './config';
 import {ActivatedRouteSnapshot, InheritedResolve, RouterStateSnapshot} from './router_state';
@@ -48,7 +49,7 @@ export function recognize(
         [], {}, {}, PRIMARY_OUTLET, rootComponentType, null, urlTree.root, -1,
         InheritedResolve.empty);
     const rootNode = new TreeNode<ActivatedRouteSnapshot>(root, children);
-    return of (new RouterStateSnapshot(url, rootNode, urlTree.queryParams, urlTree.fragment));
+    return Observable.of(new RouterStateSnapshot(url, rootNode, urlTree.queryParams, urlTree.fragment));
   } catch (e) {
     if (e instanceof NoMatch) {
       return new Observable<RouterStateSnapshot>(
